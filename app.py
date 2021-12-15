@@ -3,9 +3,9 @@
 #import joblib
 #joblib.dump(scaler,'student_scaler.pkl')
 
-from flask import Flask, render_template, session, redirect, url_for, session
+from flask import Flask, render_template, session, redirect, url_for, session, request, jsonify
 from flask_wtf import FlaskForm
-from wtforms import TextField,SubmitField
+from wtforms import StringField,SubmitField
 from wtforms.validators import NumberRange
 import numpy as np 
 from tensorflow.keras.models import load_model
@@ -26,7 +26,6 @@ def return_prediction(model,unpickled_test_df,sample_json):
   DISABILITY_IND= sample_json['DISABILITY_IND']
   CURRENT_STAY_STATUS= sample_json['CURRENT_STAY_STATUS']
   ACADEMIC_PERFORMANCE= sample_json['ACADEMIC_PERFORMANCE']
-  SUCCESS_LEVEL= sample_json['SUCCESS_LEVEL']
   FIRST_YEAR_PERSISTENCE_COUNT= sample_json['FIRST_YEAR_PERSISTENCE_COUNT']
   ENGLISH_TEST_SCORE= sample_json['ENGLISH_TEST_SCORE']
   AGE_GROUP_LONG_NAME= sample_json['AGE_GROUP_LONG_NAME']
@@ -43,14 +42,13 @@ def return_prediction(model,unpickled_test_df,sample_json):
   'DISABILITY IND':DISABILITY_IND,
   'CURRENT STAY STATUS':CURRENT_STAY_STATUS,
   'ACADEMIC PERFORMANCE':ACADEMIC_PERFORMANCE,
-  'SUCCESS LEVEL':SUCCESS_LEVEL,
   'FIRST YEAR PERSISTENCE COUNT':FIRST_YEAR_PERSISTENCE_COUNT,
   'ENGLISH TEST SCORE':ENGLISH_TEST_SCORE,
   'AGE GROUP LONG NAME':AGE_GROUP_LONG_NAME,
   'APPLICANT CATEGORY NAME':APPLICANT_CATEGORY_NAME}
 
   unpickled_test_df = unpickled_test_df.append(dict, ignore_index = True)
-
+  unpickled_test_df = unpickled_test_df.drop(['SUCCESS LEVEL'],axis=1)
   #categorical data
 
   categorical_cols = ['INTAKE COLLEGE EXPERIENCE','PRIMARY PROGRAM CODE','SCHOOL CODE','MAILING POSTAL CODE GROUP 3','GENDER','DISABILITY IND','CURRENT STAY STATUS',
@@ -59,7 +57,6 @@ def return_prediction(model,unpickled_test_df,sample_json):
   unpickled_test_df = pd.get_dummies(unpickled_test_df, columns = categorical_cols)
 
   unpickled_test_df['AGE GROUP LONG NAME'] = unpickled_test_df['AGE GROUP LONG NAME'].apply(lambda x: ['0 to 18', '19 to 20','21 to 25', '26 to 30','31 to 35', '36 to 40', '41 to 50'].index(x))
-  unpickled_test_df['SUCCESS LEVEL'] = unpickled_test_df['SUCCESS LEVEL'].apply(lambda x: ['Unsuccessful', 'Successful'].index(x))
   unpickled_test_df['ACADEMIC PERFORMANCE'] = unpickled_test_df['ACADEMIC PERFORMANCE'].apply(lambda x: ['ZZ - Unknown','DF - Poor','C - Satisfactory','AB - Good'].index(x))
 
   x = unpickled_test_df.values #returns a numpy array
@@ -71,17 +68,17 @@ def return_prediction(model,unpickled_test_df,sample_json):
   group3_hype_norm = group3_hype_norm.iloc[-1:]
   
   #predict with saved model
-  student_status = np.array(['successful', 'unsuccessful'])
+  student_status = np.array(['unsuccessful','successful'])
 
   student_status_ind = (model.predict(group3_hype_norm) > 0.5).astype(int)
 
   #return successful or unsuccessful
-  return student_status[student_status_ind][0]
+  return str(student_status[student_status_ind.tolist()[0]].tolist()[0])
 
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templete")
 # Configure a secret SECRET_KEY
-#app.config['SECRET_KEY'] = 'someRandomKey'
+app.config['SECRET_KEY'] = 'someRandomKey'
 
 # Loading the model and scaler
 student_model = load_model('Group3_HYPE.h5')
@@ -90,74 +87,66 @@ unpickled_test_df = pd.read_pickle("./group3_hype_test_df.pkl")
 # Now create a WTForm Class
 class StudentForm(FlaskForm):
 
-  INTAKE_COLLEGE_EXPERIENCE = TextField('INTAKE_COLLEGE_EXPERIENCE')
-  PRIMARY_PROGRAM_CODE = TextField('PRIMARY_PROGRAM_CODE')
-  SCHOOL_CODE = TextField('SCHOOL_CODE')
-  PROGRAM_SEMESTERS = TextField('PROGRAM_SEMESTERS')
-  TOTAL_PROGRAM_SEMESTERS = TextField('TOTAL_PROGRAM_SEMESTERS')
-  MAILING_POSTAL_CODE_GROUP_3 = TextField('MAILING_POSTAL_CODE_GROUP_3')
-  GENDER = TextField('GENDER')
-  DISABILITY_IND = TextField('DISABILITY_IND')
-  CURRENT_STAY_STATUS = TextField('CURRENT_STAY_STATUS')
-  ACADEMIC_PERFORMANCE = TextField('ACADEMIC_PERFORMANCE')
-  SUCCESS_LEVEL= TextField('SUCCESS_LEVEL')
-  FIRST_YEAR_PERSISTENCE_COUNT= TextField('FIRST_YEAR_PERSISTENCE_COUNT')
-  ENGLISH_TEST_SCORE= TextField('ENGLISH_TEST_SCORE')
-  AGE_GROUP_LONG_NAME= TextField('AGE_GROUP_LONG_NAME')
-  APPLICANT_CATEGORY_NAME= TextField('APPLICANT_CATEGORY_NAME')
+  INTAKE_COLLEGE_EXPERIENCE = StringField('INTAKE_COLLEGE_EXPERIENCE')
+  PRIMARY_PROGRAM_CODE = StringField('PRIMARY_PROGRAM_CODE')
+  SCHOOL_CODE = StringField('SCHOOL_CODE')
+  PROGRAM_SEMESTERS = StringField('PROGRAM_SEMESTERS')
+  TOTAL_PROGRAM_SEMESTERS = StringField('TOTAL_PROGRAM_SEMESTERS')
+  MAILING_POSTAL_CODE_GROUP_3 = StringField('MAILING_POSTAL_CODE_GROUP_3')
+  GENDER = StringField('GENDER')
+  DISABILITY_IND = StringField('DISABILITY_IND')
+  CURRENT_STAY_STATUS = StringField('CURRENT_STAY_STATUS')
+  ACADEMIC_PERFORMANCE = StringField('ACADEMIC_PERFORMANCE')
+  SUCCESS_LEVEL= StringField('SUCCESS_LEVEL')
+  FIRST_YEAR_PERSISTENCE_COUNT= StringField('FIRST_YEAR_PERSISTENCE_COUNT')
+  ENGLISH_TEST_SCORE= StringField('ENGLISH_TEST_SCORE')
+  AGE_GROUP_LONG_NAME= StringField('AGE_GROUP_LONG_NAME')
+  APPLICANT_CATEGORY_NAME= StringField('APPLICANT_CATEGORY_NAME')
   submit = SubmitField('Analyze')
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def index():
   # Create instance of the form.
   form = StudentForm()
   # If the form is valid on submission
-  if form.validate_on_submit():
-    # Grab the data from the input on the form.
-    
-    session['INTAKE_COLLEGE_EXPERIENCE'] = form.INTAKE_COLLEGE_EXPERIENCE.data
-    session['PRIMARY_PROGRAM_CODE'] = form.PRIMARY_PROGRAM_CODE.data
-    session['SCHOOL_CODE'] = form.SCHOOL_CODE.data
-    session['PROGRAM_SEMESTERS'] = form.PROGRAM_SEMESTERS.data
-    session['TOTAL_PROGRAM_SEMESTERS'] = form.TOTAL_PROGRAM_SEMESTERS.data
-    session['MAILING_POSTAL_CODE_GROUP_3'] = form.MAILING_POSTAL_CODE_GROUP_3.data
-    session['GENDER'] = form.GENDER.data
-    session['DISABILITY_IND'] = form.DISABILITY_IND.data
-    session['CURRENT_STAY_STATUS'] = form.CURRENT_STAY_STATUS.data
-    session['ACADEMIC_PERFORMANCE'] = form.ACADEMIC_PERFORMANCE.data
-    session['SUCCESS_LEVEL'] = form.SUCCESS_LEVEL.data
-    session['FIRST_YEAR_PERSISTENCE_COUNT'] = form.FIRST_YEAR_PERSISTENCE_COUNT.data
-    session['ENGLISH_TEST_SCORE'] = form.ENGLISH_TEST_SCORE.data
-    session['AGE_GROUP_LONG_NAME'] = form.AGE_GROUP_LONG_NAME.data
-    session['APPLICANT_CATEGORY_NAME'] = form.APPLICANT_CATEGORY_NAME.data
-
-    return redirect(url_for('prediction'))
   return render_template('home.html', form=form)
 
-@app.route('/prediction')
-def prediction():
+@app.route('/', methods=['POST'])
+def index_data():
+  # Create instance of the form.
+
   #Defining content dictionary
   content = {}
 
-  content['INTAKE_COLLEGE_EXPERIENCE'] = str(session['INTAKE_COLLEGE_EXPERIENCE'])
-  content['PRIMARY_PROGRAM_CODE'] = int(session['PRIMARY_PROGRAM_CODE'])
-  content['SCHOOL_CODE'] = str(session['SCHOOL_CODE'])
-  content['PROGRAM_SEMESTERS'] = int(session['PROGRAM_SEMESTERS'])
-  content['TOTAL_PROGRAM_SEMESTERS'] = int(session['TOTAL_PROGRAM_SEMESTERS'])
-  content['MAILING_POSTAL_CODE_GROUP_3'] = str(session['MAILING_POSTAL_CODE_GROUP_3'])
-  content['GENDER'] = str(session['GENDER'])
-  content['DISABILITY_IND'] = str(session['DISABILITY_IND'])
-  content['CURRENT_STAY_STATUS'] = str(session['CURRENT_STAY_STATUS'])
-  content['ACADEMIC_PERFORMANCE'] = str(session['ACADEMIC_PERFORMANCE'])
-  content['SUCCESS_LEVEL'] = str(session['SUCCESS_LEVEL'])
-  content['FIRST_YEAR_PERSISTENCE_COUNT'] = int(session['FIRST_YEAR_PERSISTENCE_COUNT'])
-  content['ENGLISH_TEST_SCORE'] = float(session['ENGLISH_TEST_SCORE'])
-  content['AGE_GROUP_LONG_NAME'] = str(session['AGE_GROUP_LONG_NAME'])
-  content['APPLICANT_CATEGORY_NAME'] = str(session['APPLICANT_CATEGORY_NAME'])
-
+  content['INTAKE_COLLEGE_EXPERIENCE'] = str(request.form['INTAKE_COLLEGE_EXPERIENCE'])
+  content['PRIMARY_PROGRAM_CODE'] = int(request.form['PRIMARY_PROGRAM_CODE'])
+  content['SCHOOL_CODE'] = str(request.form['SCHOOL_CODE'])
+  content['PROGRAM_SEMESTERS'] = int(request.form['PROGRAM_SEMESTERS'])
+  content['TOTAL_PROGRAM_SEMESTERS'] = int(request.form['TOTAL_PROGRAM_SEMESTERS'])
+  content['MAILING_POSTAL_CODE_GROUP_3'] = str(request.form['MAILING_POSTAL_CODE_GROUP_3'])
+  content['GENDER'] = str(request.form['GENDER'])
+  content['DISABILITY_IND'] = str(request.form['DISABILITY_IND'])
+  content['CURRENT_STAY_STATUS'] = str(request.form['CURRENT_STAY_STATUS'])
+  content['ACADEMIC_PERFORMANCE'] = str(request.form['ACADEMIC_PERFORMANCE'])
+  content['FIRST_YEAR_PERSISTENCE_COUNT'] = int(request.form['FIRST_YEAR_PERSISTENCE_COUNT'])
+  content['ENGLISH_TEST_SCORE'] = float(request.form['ENGLISH_TEST_SCORE'])
+  content['AGE_GROUP_LONG_NAME'] = str(request.form['AGE_GROUP_LONG_NAME'])
+  content['APPLICANT_CATEGORY_NAME'] = str(request.form['APPLICANT_CATEGORY_NAME'])
+  print(content)
   results = return_prediction(model=student_model,unpickled_test_df=unpickled_test_df,sample_json=content)
 
   return render_template('prediction.html',results=results)
+
+@app.route('/prediction')
+def prediction():
+
+  content = request.json
+  print(content)
+
+  results = return_prediction(model=student_model,unpickled_test_df=unpickled_test_df,sample_json=content)
+
+
+  return jsonify({"results":results})
 
 if __name__ == '__main__':
  app.run(debug=True)
