@@ -1,6 +1,6 @@
 <h1>Welcome to Student Success prediction - Group 3</h1>
 <h2>Please enter your student details below:</h2>
-<form method=”POST”>
+<form method=POST>
  {# This hidden_tag is a CSRF security feature. #}
  {{ form.hidden_tag() }}
  <br>
@@ -23,8 +23,6 @@
  {{ form.CURRENT_STAY_STATUS.label}} {{form.CURRENT_STAY_STATUS}}
  <br>
  {{ form.ACADEMIC_PERFORMANCE.label}} {{form.ACADEMIC_PERFORMANCE}}
- <br>
- {{ form.SUCCESS_LEVEL.label}} {{form.SUCCESS_LEVEL}}
  <br>
  {{ form.FIRST_YEAR_PERSISTENCE_COUNT.label}} {{form.FIRST_YEAR_PERSISTENCE_COUNT}}
  <br>
