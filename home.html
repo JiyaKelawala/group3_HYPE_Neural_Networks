@@ -3,23 +3,36 @@
 <form method=”POST”>
  {# This hidden_tag is a CSRF security feature. #}
  {{ form.hidden_tag() }}
- {{ form.program_semesters.label }} {{form.program_semesters}}
  <br>
- {{ form.total_program_semesters.label}} {{form.total_program_semesters}}
+ {{ form.INTAKE_COLLEGE_EXPERIENCE.label}} {{form.INTAKE_COLLEGE_EXPERIENCE}}
  <br>
- {{form.academic_performance.label}}{{form.academic_performance}}
+ {{ form.PRIMARY_PROGRAM_CODE.label}} {{form.PRIMARY_PROGRAM_CODE}}
  <br>
- {{form.first_year_persistence.label}}{{form.first_year_persistence}}
+ {{ form.SCHOOL_CODE.label}} {{form.SCHOOL_CODE}}
  <br>
- {{form.english_score.label}}{{form.english_score}}
+ {{ form.PROGRAM_SEMESTERS.label}} {{form.PROGRAM_SEMESTERS}}
  <br>
- {{form.age_group.label}}{{form.age_group}}
+ {{ form.TOTAL_PROGRAM_SEMESTERS.label}} {{form.TOTAL_PROGRAM_SEMESTERS}}
  <br>
- {{form.intake_experience.label}}{{form.intake_experience}}
+ {{ form.MAILING_POSTAL_CODE_GROUP_3.label}} {{form.MAILING_POSTAL_CODE_GROUP_3}}
  <br>
- {{form.applicant_category.label}}{{form.applicant_category}}
+ {{ form.GENDER.label}} {{form.GENDER}}
  <br>
- {{form.stay_status.label}}{{form.stay_status}}
+ {{ form.DISABILITY_IND.label}} {{form.DISABILITY_IND}}
+ <br>
+ {{ form.CURRENT_STAY_STATUS.label}} {{form.CURRENT_STAY_STATUS}}
+ <br>
+ {{ form.ACADEMIC_PERFORMANCE.label}} {{form.ACADEMIC_PERFORMANCE}}
+ <br>
+ {{ form.SUCCESS_LEVEL.label}} {{form.SUCCESS_LEVEL}}
+ <br>
+ {{ form.FIRST_YEAR_PERSISTENCE_COUNT.label}} {{form.FIRST_YEAR_PERSISTENCE_COUNT}}
+ <br>
+ {{ form.ENGLISH_TEST_SCORE.label}} {{form.ENGLISH_TEST_SCORE}}
+ <br>
+ {{ form.AGE_GROUP_LONG_NAME.label}} {{form.AGE_GROUP_LONG_NAME}}
+ <br>
+ {{ form.APPLICANT_CATEGORY_NAME.label}} {{form.APPLICANT_CATEGORY_NAME}}
  <br>
  {{ form.submit() }}
 </form>

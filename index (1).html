@@ -19,15 +19,22 @@
 
      <!-- Main Input For Receiving Query to our ML -->
     <form action="{{ url_for('predict')}}"method="post">
-    	<input type="text" name="program_semesters" placeholder="Program semesters" required="required" />
-        <input type="text" name="total_program_semesters" placeholder="total program semesters" required="required" />
-		<input type="text" name="academic_performance" placeholder="Academic Performance" required="required" />
-        <input type="text" name="first_year_persistence" placeholder="1st year persistence count" required="required" />
-		<input type="text" name="english_score" placeholder="english test score" required="required" />
-        <input type="text" name="age_group" placeholder="Age group" required="required" />
-        <input type="text" name="intake_experience" placeholder="Intake College experience" required="required" />
-		<input type="text" name="applicant_category" placeholder="Applicant category" required="required" />
-        <input type="text" name="stay_status" placeholder="Current stay status" required="required" />
+
+        <input type="text" name="INTAKE_COLLEGE_EXPERIENCE" placeholder="" required="required" />
+        <input type="text" name="PRIMARY_PROGRAM_CODE" placeholder="" required="required" />
+        <input type="text" name="SCHOOL_CODE" placeholder="" required="required" />
+        <input type="text" name="PROGRAM_SEMESTERS" placeholder="" required="required" />
+        <input type="text" name="TOTAL_PROGRAM_SEMESTERS" placeholder="" required="required" />
+        <input type="text" name="MAILING_POSTAL_CODE_GROUP_3" placeholder="" required="required" />
+        <input type="text" name="GENDER" placeholder="" required="required" />
+        <input type="text" name="DISABILITY_IND" placeholder="" required="required" />
+        <input type="text" name="CURRENT_STAY_STATUS" placeholder="" required="required" />
+        <input type="text" name="ACADEMIC_PERFORMANCE" placeholder="" required="required" />
+        <input type="text" name="SUCCESS_LEVEL" placeholder="" required="required" />
+        <input type="text" name="FIRST_YEAR_PERSISTENCE_COUNT" placeholder="" required="required" />
+        <input type="text" name="ENGLISH_TEST_SCORE" placeholder="" required="required" />
+        <input type="text" name="AGE_GROUP_LONG_NAME" placeholder="" required="required" />
+        <input type="text" name="APPLICANT_CATEGORY_NAME" placeholder="" required="required" />
 
         <button type="submit" class="btn btn-primary btn-block btn-large">Predict</button>
     </form>
