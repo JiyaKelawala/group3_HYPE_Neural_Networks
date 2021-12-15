@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html >
+<!--styling source-->
+<!--From https://codepen.io/frytyler/pen/EGdtg-->
+<head>
+  <meta charset="UTF-8">
+  <title>Student Success - Group 3</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  
+</head>
+
+<body>
+ <div class="login">
+	<h1>Predict Student Success</h1>
+
+     <!-- Main Input For Receiving Query to our ML -->
+    <form action="{{ url_for('predict')}}"method="post">
+    	<input type="text" name="program_semesters" placeholder="Program semesters" required="required" />
+        <input type="text" name="total_program_semesters" placeholder="total program semesters" required="required" />
+		<input type="text" name="academic_performance" placeholder="Academic Performance" required="required" />
+        <input type="text" name="first_year_persistence" placeholder="1st year persistence count" required="required" />
+		<input type="text" name="english_score" placeholder="english test score" required="required" />
+        <input type="text" name="age_group" placeholder="Age group" required="required" />
+        <input type="text" name="intake_experience" placeholder="Intake College experience" required="required" />
+		<input type="text" name="applicant_category" placeholder="Applicant category" required="required" />
+        <input type="text" name="stay_status" placeholder="Current stay status" required="required" />
+
+        <button type="submit" class="btn btn-primary btn-block btn-large">Predict</button>
+    </form>
+
+   <br>
+   <br>
+   {{ prediction_text }}
+
+ </div>
+
+
+</body>
+</html>
